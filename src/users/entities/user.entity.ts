@@ -1,31 +1,87 @@
-import { Column, Entity, Index, PrimaryGeneratedColumn } from 'typeorm'
-import { Exclude } from 'class-transformer'
-
+import {
+  Entity,
+  PrimaryGeneratedColumn,
+  Column,
+  CreateDateColumn,
+  UpdateDateColumn,
+  OneToMany,
+  ManyToMany,
+  JoinTable,
+  Index,
+} from 'typeorm';
+import { Exclude } from 'class-transformer';
+import { Role } from './role.entity';
 @Entity('users')
-@Index(['email'], { unique: true})
+@Index(['email'], { unique: true })
 export class User {
-    @PrimaryGeneratedColumn('uuid')
-    id: string;
+  @PrimaryGeneratedColumn('uuid')
+  id: string;
 
-    @Column({unique: true})
-    email: string;
+  @Column({ unique: true })
+  email: string;
 
-    @Column()
-    @Exclude()
-    passwordHash: string;
+  @Column({ nullable: true })
+  phone: string;
 
-    @Column()
-    firstName: string;
+  @Column()
+  @Exclude()
+  passwordHash: string;
 
-    @Column()
-    lastName: string;
+  @Column()
+  firstName: string;
 
-    @Column({ nullable: true })
-    phone: string
+  @Column()
+  lastName: string;
 
-    @Column({ default: true })
-    isActive: boolean
+  @Column({ default: false })
+  isVerified: boolean;
 
-    @Column({ default: false })
-    isVerified: boolean
+  @Column({ default: true })
+  isActive: boolean;
+
+  @Column({ type: 'timestamp', nullable: true })
+  lastLogin: Date;
+
+  @Column({ default: 0 })
+  failedLoginAttempts: number;
+
+  @Column({ type: 'timestamp', nullable: true })
+  lockedUntil: Date;
+
+  @Column({ nullable: true })
+  @Exclude()
+  emailVerificationToken: string;
+
+  @Column({ type: 'timestamp', nullable: true })
+  emailVerificationExpires: Date;
+
+  @Column({ nullable: true })
+  @Exclude()
+  passwordResetToken: string;
+
+  @Column({ type: 'timestamp', nullable: true })
+  passwordResetExpires: Date;
+
+  @ManyToMany(() => Role, (role) => role.users)
+  @JoinTable({
+    name: 'user_roles',
+    joinColumn: { name: 'userId', referencedColumnName: 'id' },
+    inverseJoinColumn: { name: 'roleId', referencedColumnName: 'id' },
+  })
+  roles: Role[];
+
+  @CreateDateColumn()
+  createdAt: Date;
+
+  @UpdateDateColumn()
+  updatedAt: Date;
+
+  // Virtual properties
+  get fullName(): string {
+    return `${this.firstName} ${this.lastName}`;
+  }
+
+  get isLocked(): boolean {
+    return this.lockedUntil && this.lockedUntil > new Date();
+  }
 }
