@@ -63,4 +63,37 @@ export class UsersService {
     return { users, total };
   }
 
+  async findOne(id: string): Promise<User> {
+    const user = await this.userRepository.findOne({
+      where: { id: id },
+      relations: ['roles', 'roles.permissions'],
+    })
+
+    if (!user) {
+        throw new NotFoundException('کاربر یافت نشد');
+    }
+
+    return user;
+  }
+
+  async findByEmail(email: string): Promise<User | null> {
+    return await this.userRepository.findOne({
+      where: { email },
+      relations: ['roles', 'roles.permissions'],
+    });
+  }
+
+  async update(id: string, updateUserDto: UpdateUserDto): Promise<User> {
+    const user = await this.findOne(id);
+
+    if (updateUserDto.email && updateUserDto.email !== user.email) {
+      const existingUser = await this.findByEmail(updateUserDto.email);
+      if (existingUser) {
+        throw new ConflictException('کاربر با این ایمیل از قبل وجود دارد');
+      }
+    }
+
+    Object.assign(user, updateUserDto);
+    return await this.userRepository.save(user);
+  }
 }
