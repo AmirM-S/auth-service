@@ -200,4 +200,28 @@ export class UsersService {
 
     return user;
   }
+
+  async assignRole(userId: string, roleId: string): Promise<User> {
+    const user = await this.findOne(userId);
+    const role = await this.roleRepository.findOne({ where: { id: roleId } });
+
+    if (!role) {
+      throw new NotFoundException('نقش یافت نشد');
+    }
+
+    if (!user.roles.some((r) => r.id === roleId)) {
+      user.roles.push(role);
+      await this.userRepository.save(user);
+    }
+
+    return user;
+  }
+
+  async removeRole(userId: string, roleId: string): Promise<User> {
+    const user = await this.findOne(userId);
+    user.roles = user.roles.filter((role) => role.id !== roleId);
+    return await this.userRepository.save(user);
+  }
+
+  
 }
