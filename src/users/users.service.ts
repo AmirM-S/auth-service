@@ -150,7 +150,7 @@ export class UsersService {
     });
 
     if (!user || user.emailVerificationExpires < new Date()) {
-      throw new BadRequestException('توکن ارسالی صحیح نیست');
+      throw new BadRequestException('توکن صحیح نمی باشد');
     }
 
     await this.userRepository.update(user.id, {
@@ -161,5 +161,43 @@ export class UsersService {
 
     return user;
   }
-  
+
+  async setPasswordResetToken(
+    email: string,
+    token: string,
+    expires: Date,
+  ): Promise<User> {
+    const user = await this.findByEmail(email);
+    if (!user) {
+      throw new NotFoundException('کاربر یافت نشد');
+    }
+
+    await this.userRepository.update(user.id, {
+      passwordResetToken: token,
+      passwordResetExpires: expires,
+    });
+
+    return user;
+  }
+
+  async resetPassword(token: string, newPassword: string): Promise<User> {
+    const user = await this.userRepository.findOne({
+      where: { passwordResetToken: token },
+    });
+
+    if (!user || user.passwordResetExpires < new Date()) {
+      throw new BadRequestException('توکن صحیح نمی باشد');
+    }
+
+    const saltRounds = parseInt(process.env.BCRYPT_SALT_ROUNDS) || 12;
+    const passwordHash = await bcrypt.hash(newPassword, saltRounds);
+
+    await this.userRepository.update(user.id, {
+      passwordHash,
+      passwordResetToken: null,
+      passwordResetExpires: null,
+    });
+
+    return user;
+  }
 }
