@@ -127,4 +127,25 @@ export class UsersService {
       failedLoginAttempts: 0,
     });
   }
+
+  async incrementFailedLoginAttempts(id: string): Promise<number> {
+    await this.userRepository.increment({ id }, 'failedLoginAttempts', 1);
+    const user = await this.userRepository.findOne({ where: { id } });
+    return user.failedLoginAttempts;
+  }
+
+  async resetFailedLoginAttempts(id: string): Promise<void> {
+    await this.userRepository.update(id, { failedLoginAttempts: 0 });
+  }
+
+  async setEmailVerificationToken(
+    id: string,
+    token: string,
+    expires: Date,
+  ): Promise<void> {
+    await this.userRepository.update(id, {
+      emailVerificationToken: token,
+      emailVerificationExpires: expires,
+    });
+  }
 }
