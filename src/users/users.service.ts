@@ -52,7 +52,10 @@ export class UsersService {
     return await this.userRepository.save(user);
   }
 
-  async findAll(page: number = 1, limit: number = 10): Promise<{ users: User[]; total: number }> {
+  async findAll(
+    page: number = 1,
+    limit: number = 10,
+  ): Promise<{ users: User[]; total: number }> {
     const [users, total] = await this.userRepository.findAndCount({
       relations: ['roles', 'roles.permissions'],
       skip: (page - 1) * limit,
@@ -67,10 +70,10 @@ export class UsersService {
     const user = await this.userRepository.findOne({
       where: { id: id },
       relations: ['roles', 'roles.permissions'],
-    })
+    });
 
     if (!user) {
-        throw new NotFoundException('کاربر یافت نشد');
+      throw new NotFoundException('کاربر یافت نشد');
     }
 
     return user;
@@ -95,5 +98,33 @@ export class UsersService {
 
     Object.assign(user, updateUserDto);
     return await this.userRepository.save(user);
+  }
+
+  async updatePassword(id: string, newPassword: string): Promise<void> {
+    const passwordHash = await bcrypt.hash(newPassword, 10);
+
+    await this.userRepository.update(id, { passwordHash });
+  }
+
+  async verifyPassword(user: User, password: string): Promise<boolean> {
+    return await bcrypt.compare(password, user.passwordHash);
+  }
+
+  async lockUser(
+    id: string,
+    lockDuration: number = 15 * 60 * 1000,
+  ): Promise<void> {
+    const lockedUntil = new Date(Date.now() + lockDuration);
+    await this.userRepository.update(id, {
+      lockedUntil,
+      failedLoginAttempts: 0,
+    });
+  }
+
+  async unlockUser(id: string): Promise<void> {
+    await this.userRepository.update(id, {
+      lockedUntil: null,
+      failedLoginAttempts: 0,
+    });
   }
 }
