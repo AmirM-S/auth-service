@@ -223,5 +223,28 @@ export class UsersService {
     return await this.userRepository.save(user);
   }
 
-  
+  async getUserPermissions(userId: string): Promise<string[]> {
+    const user = await this.userRepository.findOne({
+      where: { id: userId },
+      relations: ['roles', 'roles.permissions'],
+    });
+
+    if (!user) {
+      return [];
+    }
+
+    const permissions = new Set<string>();
+    user.roles.forEach(role => {
+      role.permissions.forEach(permission => {
+        permissions.add(`${permission.resource}:${permission.action}`);
+      });
+    });
+
+    return Array.from(permissions);
+  }
+
+  async hasPermission(userId: string, resource: string, action: string): Promise<boolean> {
+    const permissions = await this.getUserPermissions(userId);
+    return permissions.includes(`${resource}:${action}`) || permissions.includes('*:*');
+  }
 }
