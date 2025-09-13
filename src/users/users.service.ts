@@ -142,10 +142,24 @@ export class UsersService {
     id: string,
     token: string,
     expires: Date,
-  ): Promise<void> {
-    await this.userRepository.update(id, {
-      emailVerificationToken: token,
-      emailVerificationExpires: expires,
+  ): Promise<void> {}
+
+  async verifyEmail(token: string): Promise<User> {
+    const user = await this.userRepository.findOne({
+      where: { emailVerificationToken: token },
     });
+
+    if (!user || user.emailVerificationExpires < new Date()) {
+      throw new BadRequestException('توکن ارسالی صحیح نیست');
+    }
+
+    await this.userRepository.update(user.id, {
+      isVerified: true,
+      emailVerificationToken: null,
+      emailVerificationExpires: null,
+    });
+
+    return user;
   }
+  
 }
