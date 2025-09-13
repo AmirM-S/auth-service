@@ -234,8 +234,8 @@ export class UsersService {
     }
 
     const permissions = new Set<string>();
-    user.roles.forEach(role => {
-      role.permissions.forEach(permission => {
+    user.roles.forEach((role) => {
+      role.permissions.forEach((permission) => {
         permissions.add(`${permission.resource}:${permission.action}`);
       });
     });
@@ -243,8 +243,31 @@ export class UsersService {
     return Array.from(permissions);
   }
 
-  async hasPermission(userId: string, resource: string, action: string): Promise<boolean> {
+  async hasPermission(
+    userId: string,
+    resource: string,
+    action: string,
+  ): Promise<boolean> {
     const permissions = await this.getUserPermissions(userId);
-    return permissions.includes(`${resource}:${action}`) || permissions.includes('*:*');
+    return (
+      permissions.includes(`${resource}:${action}`) ||
+      permissions.includes('*:*')
+    );
+  }
+
+  async updateLastLogin(id: string): Promise<void> {
+    await this.userRepository.update(id, { lastLogin: new Date() });
+  }
+
+  async deactivate(id: string): Promise<User> {
+    const user = await this.findOne(id);
+    user.isActive = false;
+    return await this.userRepository.save(user);
+  }
+
+  async activate(id: string): Promise<User> {
+    const user = await this.findOne(id);
+    user.isActive = true;
+    return await this.userRepository.save(user);
   }
 }
