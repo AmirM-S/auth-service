@@ -12,6 +12,7 @@ import {
 import { Exclude } from 'class-transformer';
 import { Role } from './role.entity';
 import { RefreshToken } from '@/auth/entities/refresh-token.entity';
+import { UserMfa } from '@/mfa/entities/user-mfa.entity';
 @Entity('users')
 @Index(['email'], { unique: true })
 export class User {
@@ -73,6 +74,9 @@ export class User {
 
   @OneToMany(() => RefreshToken, (token) => token.user)
   refreshTokens: RefreshToken[]
+
+   @OneToMany(() => UserMfa, (mfa) => mfa.user)
+  mfaSettings: UserMfa[];
 
   @CreateDateColumn()
   createdAt: Date;
