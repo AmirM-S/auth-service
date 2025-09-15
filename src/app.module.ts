@@ -8,6 +8,7 @@ import { databaseConfig } from './config/database.config';
 import { AuthModule } from './auth/auth.module';
 import { MailModule } from './mail/mail.module';
 import { RedisModule } from './redis/redis.module';
+import { redisConfig } from './config/redis.config';
 
 @Module({
   imports: [
@@ -20,10 +21,14 @@ import { RedisModule } from './redis/redis.module';
       useFactory: databaseConfig,
       inject: [ConfigService],
     }),
+    RedisModule.forRootAsync({
+      imports: [ConfigModule],
+      useFactory: redisConfig,
+      inject: [ConfigService],
+    }),
     UsersModule,
     AuthModule,
     MailModule,
-    RedisModule
   ],
   controllers: [AppController],
   providers: [AppService],
