@@ -11,6 +11,7 @@ import {
 } from 'typeorm';
 import { Exclude } from 'class-transformer';
 import { Role } from './role.entity';
+import { RefreshToken } from '@/auth/entities/refresh-token.entity';
 @Entity('users')
 @Index(['email'], { unique: true })
 export class User {
@@ -69,6 +70,9 @@ export class User {
     inverseJoinColumn: { name: 'roleId', referencedColumnName: 'id' },
   })
   roles: Role[];
+
+  @OneToMany(() => RefreshToken, (token) => token.user)
+  refreshTokens: RefreshToken[]
 
   @CreateDateColumn()
   createdAt: Date;
