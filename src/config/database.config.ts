@@ -1,6 +1,4 @@
-import { User } from '../users/entities/user.entity';
-import { Role } from '../users/entities/role.entity';
-import { Permission } from '../users/entities/permission.entity';
+import * as path from 'path'
 
 import { ConfigService } from '@nestjs/config';
 import { TypeOrmModuleOptions } from '@nestjs/typeorm';
@@ -14,7 +12,7 @@ export const databaseConfig = (
   username: configService.get('DATABASE_USERNAME', 'auth_user'),
   password: configService.get('DATABASE_PASSWORD', 'auth_password'),
   database: configService.get('DATABASE_NAME', 'auth_service'),
-  entities: [User, Role, Permission],
+  entities: [path.join(__dirname, '../**/*.entity.{js,ts}')],
   synchronize: configService.get('NODE_ENV') === 'development',
   logging: configService.get('NODE_ENV') === 'development',
 });
