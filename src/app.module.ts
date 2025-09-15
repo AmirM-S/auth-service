@@ -9,6 +9,7 @@ import { AuthModule } from './auth/auth.module';
 import { MailModule } from './mail/mail.module';
 import { RedisModule } from './redis/redis.module';
 import { redisConfig } from './config/redis.config';
+import { MfaModule } from './mfa/mfa.module';
 
 @Module({
   imports: [
@@ -29,6 +30,7 @@ import { redisConfig } from './config/redis.config';
     UsersModule,
     AuthModule,
     MailModule,
+    MfaModule,
   ],
   controllers: [AppController],
   providers: [AppService],
