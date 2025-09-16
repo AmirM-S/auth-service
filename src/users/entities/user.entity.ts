@@ -13,6 +13,7 @@ import { Exclude } from 'class-transformer';
 import { Role } from './role.entity';
 import { RefreshToken } from '@/auth/entities/refresh-token.entity';
 import { UserMfa } from '@/mfa/entities/user-mfa.entity';
+import { SocialAccount } from '@/social-auth/entities/social-account.entity';
 @Entity('users')
 @Index(['email'], { unique: true })
 export class User {
@@ -73,10 +74,13 @@ export class User {
   roles: Role[];
 
   @OneToMany(() => RefreshToken, (token) => token.user)
-  refreshTokens: RefreshToken[]
+  refreshTokens: RefreshToken[];
 
-   @OneToMany(() => UserMfa, (mfa) => mfa.user)
+  @OneToMany(() => UserMfa, (mfa) => mfa.user)
   mfaSettings: UserMfa[];
+
+  @OneToMany(() => SocialAccount, (account) => account.user)
+  socialAccounts: SocialAccount[];
 
   @CreateDateColumn()
   createdAt: Date;
