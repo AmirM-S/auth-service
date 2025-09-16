@@ -13,6 +13,7 @@ import { MfaModule } from './mfa/mfa.module';
 import { SocialAuthModule } from './social-auth/social-auth.module';
 import { AdminModule } from './admin/admin.module';
 import { LoggerModule } from './logger/logger.module';
+import { HealthModule } from './health/health.module';
 
 @Module({
   imports: [
@@ -37,6 +38,7 @@ import { LoggerModule } from './logger/logger.module';
     SocialAuthModule,
     AdminModule,
     LoggerModule,
+    HealthModule,
   ],
   controllers: [AppController],
   providers: [AppService],
