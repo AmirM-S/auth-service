@@ -12,6 +12,7 @@ import { redisConfig } from './config/redis.config';
 import { MfaModule } from './mfa/mfa.module';
 import { SocialAuthModule } from './social-auth/social-auth.module';
 import { AdminModule } from './admin/admin.module';
+import { LoggerModule } from './logger/logger.module';
 
 @Module({
   imports: [
@@ -35,6 +36,7 @@ import { AdminModule } from './admin/admin.module';
     MfaModule,
     SocialAuthModule,
     AdminModule,
+    LoggerModule,
   ],
   controllers: [AppController],
   providers: [AppService],
