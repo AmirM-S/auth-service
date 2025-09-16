@@ -11,6 +11,7 @@ import { RedisModule } from './redis/redis.module';
 import { redisConfig } from './config/redis.config';
 import { MfaModule } from './mfa/mfa.module';
 import { SocialAuthModule } from './social-auth/social-auth.module';
+import { AdminModule } from './admin/admin.module';
 
 @Module({
   imports: [
@@ -33,6 +34,7 @@ import { SocialAuthModule } from './social-auth/social-auth.module';
     MailModule,
     MfaModule,
     SocialAuthModule,
+    AdminModule,
   ],
   controllers: [AppController],
   providers: [AppService],
